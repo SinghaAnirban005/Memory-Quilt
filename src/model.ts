@@ -1,4 +1,4 @@
-import mongoose, { Schema, Model } from "mongoose";
+import mongoose, { Schema, model } from "mongoose";
 
 const userSchema = new Schema({
     username: {
@@ -44,6 +44,6 @@ const linkSchema = new Schema(
     }
 )
 
-export const linkModel = new Model('Links', linkSchema)
-export const userModel = new Model("User", userSchema)
-export const contentModel = new Model('Content', contentSchema)
+export const linkModel =  model('Links', linkSchema)
+export const userModel =  model("User", userSchema)
+export const contentModel =  model('Content', contentSchema)
