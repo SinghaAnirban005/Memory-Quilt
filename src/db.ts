@@ -1,4 +1,4 @@
-const MG_str = "mongodb+srv://Anirban:Singha@memoryquilt.itwlb.mongodb.net"
+import { MG_str } from "./config"
 import mongoose from "mongoose"
 
 const connectDB = async function() {

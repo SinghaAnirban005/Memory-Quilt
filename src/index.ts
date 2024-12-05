@@ -2,10 +2,12 @@ import express from "express"
 import jwt from "jsonwebtoken"
 import connectDB from "./db"
 import { userModel } from "./model"
+import { linkModel } from "./model"
 import { contentModel } from "./model"
 import bcrypt from "bcrypt"
 import { PRIVATE_KEY } from "./config"
 import { userMiddleware } from "./middleware"
+import { random } from "./utils"
 
 const app = express()
 
@@ -110,11 +112,48 @@ app.delete('/api/v1/content',userMiddleware, async(req, res) => {
     })
 })
 
-app.post('/api/v1/memory/share', (req, res) => {
+app.post('/api/v1/memory/share',userMiddleware, async(req, res) => {
+    const link = req.body.link
 
+    if(link){
+        const existingLink = await linkModel.find({
+            //@ts-ignore
+            userId: req.userId
+        })
+        if (existingLink) {
+            res.json({
+                hash: existingLink.hash
+            })
+            return;
+        }
+        const hash = random(10)
+        await linkModel.create({
+            //@ts-ignore
+            userId: req.userId,
+            hash: hash
+        })
+
+        res.json(
+            {
+                hash
+            }
+        )
+    }
+    else{
+        await linkModel.deleteOne({
+            //@ts-ignore
+            userId: req.userId
+        })
+
+        res.json(
+            {
+                "message": "Removed link"
+            }
+        )
+    }
 })
 
-app.post('/api/v1/memory/:shareLink', (req, res) => {
+app.get('/api/v1/memory/:shareLink', async(req, res) => {
 
 })
 
