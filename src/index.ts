@@ -9,6 +9,7 @@ import { userMiddleware } from "./middleware"
 import { random } from "./utils"
 import cors from "cors"
 import connectDB from "./db"
+import mongoose from "mongoose"
 
 const app = express()
 
@@ -93,6 +94,7 @@ app.post('/api/v1/content', userMiddleware, async(req, res) => {
 app.get('/api/v1/content', userMiddleware, async(req, res) => {
     const contents = await ContentModel.find(
         {
+            //@ts-ignore
             userId: req.userId
         }
     ).populate('userId', 'username')
@@ -109,6 +111,7 @@ app.delete('/api/v1/content',userMiddleware, async(req, res) => {
 
     await ContentModel.deleteMany({
         _id: contentId,
+        //@ts-ignore
         userId: req.userId
     })
 
@@ -122,18 +125,21 @@ app.post('/api/v1/memory/share',userMiddleware, async(req, res) => {
 
     if(share){
         const existingLink = await LinkModel.find({
-            userId: req.userId
+            //@ts-ignore
+            userId: new mongoose.Types.ObjectId(req.userId)
         })
+        
         if (existingLink) {
             res.json({
                 //@ts-ignore
-                hash: existingLink.hash
+                hash: existingLink[0]?.hash,
+                message: "Opeartion is  succesfull"
             })
             return;
         }
         const hash = random(10)
-        console.log(hash)
         await LinkModel.create({
+            //@ts-ignore
             userId: req.userId,
             hash: hash
         })
@@ -146,6 +152,7 @@ app.post('/api/v1/memory/share',userMiddleware, async(req, res) => {
     }
     else{
         await LinkModel.deleteOne({
+            //@ts-ignore
             userId: req.userId
         })
 
