@@ -13,7 +13,6 @@ const userMiddleware = async function(req: Request, res: Response, next: NextFun
             })
             return
         }
-            //@ts-ignore
             req.userId = (decodedToken as JwtPayload)._id
             next()
     }

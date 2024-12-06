@@ -44,6 +44,6 @@ const linkSchema = new Schema(
     }
 )
 
-export const linkModel =  model('Links', linkSchema)
-export const userModel =  model("User", userSchema)
-export const contentModel =  model('Content', contentSchema)
+export const LinkModel =  model('Links', linkSchema)
+export const UserModel =  model("User", userSchema)
+export const ContentModel =  model('Content', contentSchema)

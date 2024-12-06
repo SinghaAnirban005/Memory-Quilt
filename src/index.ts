@@ -1,27 +1,33 @@
 import express from "express"
 import jwt from "jsonwebtoken"
-import connectDB from "./db"
-import { userModel } from "./model"
-import { linkModel } from "./model"
-import { contentModel } from "./model"
+import { UserModel } from "./model"
+import { LinkModel } from "./model"
+import { ContentModel } from "./model"
 import bcrypt from "bcrypt"
 import { PRIVATE_KEY } from "./config"
 import { userMiddleware } from "./middleware"
 import { random } from "./utils"
+import cors from "cors"
+import connectDB from "./db"
 
 const app = express()
+
+connectDB()
+
+app.use(express.json())
+app.use(cors())
 
 app.post('/api/v1/signup', async(req, res) => {
     try {
         const username = req.body.username
         const password = req.body.password
 
-        const hashedPassword = bcrypt.hash(password, 10)
-        
-        const newUser = await userModel.create({
-            username,
+        const hashedPassword = await bcrypt.hash(password, 10)
+
+        const newUser = await UserModel.create({
+            username: username,
             password: hashedPassword
-        })
+        }) 
 
         res.json(
             {
@@ -31,7 +37,7 @@ app.post('/api/v1/signup', async(req, res) => {
     } catch (error) {
         res.status(400).json(
             {
-                message: "User already exists"
+                message: error
             }
         )     
     }
@@ -42,7 +48,7 @@ app.post('/api/v1/signin', async(req, res) => {
     const { username, password } = req.body
 
    try {
-     const existingUser = await userModel.findOne({
+     const existingUser = await UserModel.findOne({
          username: username
      })
      if(existingUser){
@@ -67,7 +73,7 @@ app.post('/api/v1/signin', async(req, res) => {
 app.post('/api/v1/content', userMiddleware, async(req, res) => {
     const {link, type, title} = req.body
 
-    const content = await contentModel.create({
+    const content = await ContentModel.create({
         link, 
         type,
         title,
@@ -78,15 +84,15 @@ app.post('/api/v1/content', userMiddleware, async(req, res) => {
 
     res.json(
         {
-            message: "Content has been added Succesfully !!"
+            message: "Content has been added Succesfully !!" ,
+            content: content
         }
     )
 })
 
 app.get('/api/v1/content', userMiddleware, async(req, res) => {
-    const contents = await contentModel.find(
+    const contents = await ContentModel.find(
         {
-            //@ts-ignore
             userId: req.userId
         }
     ).populate('userId', 'username')
@@ -101,9 +107,8 @@ app.get('/api/v1/content', userMiddleware, async(req, res) => {
 app.delete('/api/v1/content',userMiddleware, async(req, res) => {
     const contentId = req.body.contentId
 
-    await contentModel.deleteMany({
+    await ContentModel.deleteMany({
         _id: contentId,
-        //@ts-ignore
         userId: req.userId
     })
 
@@ -113,35 +118,34 @@ app.delete('/api/v1/content',userMiddleware, async(req, res) => {
 })
 
 app.post('/api/v1/memory/share',userMiddleware, async(req, res) => {
-    const link = req.body.link
+    const share = req.body.share
 
-    if(link){
-        const existingLink = await linkModel.find({
-            //@ts-ignore
+    if(share){
+        const existingLink = await LinkModel.find({
             userId: req.userId
         })
         if (existingLink) {
             res.json({
+                //@ts-ignore
                 hash: existingLink.hash
             })
             return;
         }
         const hash = random(10)
-        await linkModel.create({
-            //@ts-ignore
+        console.log(hash)
+        await LinkModel.create({
             userId: req.userId,
             hash: hash
         })
 
         res.json(
             {
-                hash
+                hash: hash
             }
         )
     }
     else{
-        await linkModel.deleteOne({
-            //@ts-ignore
+        await LinkModel.deleteOne({
             userId: req.userId
         })
 
@@ -154,17 +158,44 @@ app.post('/api/v1/memory/share',userMiddleware, async(req, res) => {
 })
 
 app.get('/api/v1/memory/:shareLink', async(req, res) => {
+    const hash = req.params.shareLink
 
-})
+    const link = await LinkModel.findOne({
+        hash: hash
+    })
 
-
-app.listen(3000, async() => {
-    try {
-        await connectDB
-        console.log('MONGO_DB connected !!')
-    } catch (error) {
-        console.log(error)
+    if(!link){
+        res.status(403).json(
+            {
+                message: 'Sorry incorrect input'
+            }
+        )
+        return
     }
+
+    const content = await ContentModel.find({
+        userId: link.userId
+    })
+    const user = await UserModel.findOne({
+        _id: link.userId
+    })
+
+    if (!user) {
+        res.status(411).json({
+            message: "user not found, error should ideally not happen"
+        })
+        return;
+    }
+    
+    res.status(200).json(
+        {
+            username: user.username,
+            content: content 
+        }
+    )
 })
+
+
+app.listen(3000)
 
 export default app
