@@ -1,4 +1,4 @@
-import express from "express"
+import express, { urlencoded } from "express"
 import jwt from "jsonwebtoken"
 import { UserModel } from "./model"
 import { LinkModel } from "./model"
@@ -16,6 +16,7 @@ const app = express()
 connectDB()
 
 app.use(express.json())
+app.use(urlencoded())
 app.use(cors())
 
 app.post('/api/v1/signup', async(req, res) => {
@@ -46,8 +47,7 @@ app.post('/api/v1/signup', async(req, res) => {
 })
 
 app.post('/api/v1/signin', async(req, res) => {
-    const { username, password } = req.body
-
+    const { username } = req.body
    try {
      const existingUser = await UserModel.findOne({
          username: username
