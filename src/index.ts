@@ -3,6 +3,8 @@ import jwt from "jsonwebtoken"
 import { UserModel } from "./model"
 import { LinkModel } from "./model"
 import { ContentModel } from "./model"
+import { TweetModel } from "./model"
+import { YoutubeModel } from "./model"
 import bcrypt from "bcrypt"
 import { PRIVATE_KEY } from "./config"
 import { userMiddleware } from "./middleware"
@@ -202,6 +204,120 @@ app.get('/api/v1/memory/:shareLink', async(req, res) => {
     )
 })
 
+app.post('/api/v1/tweet',userMiddleware, async(req, res) => {
+    try {
+        const { url } = req.body
+        //@ts-ignore
+        const userId = req.userId
+
+        if(!url){
+            res.json(
+                {
+                    message: "Please provide URL"
+                }
+            )
+        }
+
+        const tweet = await TweetModel.create({
+            url: url,
+            user: userId
+        })
+
+        res.status(200).json(
+            {
+                message: 'Tweet linked succesfully !!',
+                tweet: tweet
+            }
+        )
+    } catch (error) {
+        res.status(500).json(
+            {
+                message: "Server errror :: Failed to save tweet"
+            }
+        )
+    }
+})
+
+app.get('/api/v1/tweet',userMiddleware, async(req, res) => {
+    try {   
+        //@ts-ignore
+        const userId = req.userId
+        const tweets = await TweetModel.findById({
+            user: userId
+        })
+
+        res.status(200).json(
+            {
+                message: 'Fetched all tweets',
+                tweets: tweets
+            }
+        )
+    } catch (error) {
+        res.status(500).json(
+            {
+                message: "Failed to fetch tweets"
+            }
+        )   
+    }
+})
+
+
+app.post('/api/v1/youtube',userMiddleware, async(req, res) => {
+    try {
+        const { url } = req.body
+        //@ts-ignore
+        const userId = req.userId
+        
+        if(!url){
+            res.json(
+                {
+                    message: "Please provide URL"
+                }
+            )
+        }
+
+        const youtube = await YoutubeModel.create({
+            url: url,
+            user: userId
+        })
+
+        res.status(200).json(
+            {
+                message: 'Youtube linked succesfully !!',
+                youtube: youtube
+            }
+        )
+    } catch (error) {
+        res.status(500).json(
+            {
+                message: "Server errror :: Failed to save Youtube"
+            }
+        )
+    }
+})
+
+app.get('/api/v1/youtube',userMiddleware, async(req, res) => {
+    try {   
+        //@ts-ignore
+        const userId = req.userId
+        const youtube = await YoutubeModel.findById({
+            user: userId
+        })
+
+        res.status(200).json(
+            {
+                message: 'Fetched all youtube videos',
+                youtube: youtube
+            }
+        )
+    } catch (error) {
+        res.status(500).json(
+            {
+                message: "Failed to fetch videos"
+            }
+        )   
+    }
+})
 
 app.listen(3000)
 

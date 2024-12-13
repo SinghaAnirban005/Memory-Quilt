@@ -44,6 +44,34 @@ const linkSchema = new Schema(
     }
 )
 
+const TweetSchema = new Schema(
+    {
+        url: String,
+        user:{
+            type: mongoose.Types.ObjectId,
+            ref:'User'
+        }
+    },
+    {
+        timestamps: true
+    }
+)
+
+const YoutubeSchema = new Schema(
+    {
+        url: String,
+        user:{
+            type: mongoose.Types.ObjectId,
+            ref:'User'
+        }
+    },
+    {
+        timestamps: true
+    }
+)
+
+export const YoutubeModel = model('Youtube', YoutubeSchema)
 export const LinkModel =  model('Links', linkSchema)
 export const UserModel =  model("User", userSchema)
 export const ContentModel =  model('Content', contentSchema)
+export const TweetModel = model('Tweet', TweetSchema)
