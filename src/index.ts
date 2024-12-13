@@ -261,6 +261,30 @@ app.get('/api/v1/tweet',userMiddleware, async(req, res) => {
     }
 })
 
+app.delete('api/v1/delete/tweet', async(req, res) => {
+    const { url } = req.body
+
+    if(!url){
+        res.status(403).json(
+            {
+                message: "No URL found"
+            }
+        )
+    }
+
+    await ContentModel.findOneAndDelete({
+        link: url
+    })
+    await TweetModel.findOneAndDelete({
+        url: url
+    })
+
+    res.status(200).json(
+        {
+            message: "Succesfully deleted tweet !!"
+        }
+    )
+})
 
 app.post('/api/v1/youtube',userMiddleware, async(req, res) => {
     try {
@@ -317,6 +341,31 @@ app.get('/api/v1/youtube',userMiddleware, async(req, res) => {
             }
         )   
     }
+})
+
+app.delete('api/v1/delete/youtube', async(req, res) => {
+    const { url } = req.body
+
+    if(!url){
+        res.status(403).json(
+            {
+                message: "No URL found"
+            }
+        )
+    }
+
+    await ContentModel.findOneAndDelete({
+        link: url
+    })
+    await YoutubeModel.findOneAndDelete({
+        url: url
+    })
+
+    res.status(200).json(
+        {
+            message: "Succesfully deleted Youtube !!"
+        }
+    )
 })
 
 app.listen(3000)
