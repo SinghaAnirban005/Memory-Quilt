@@ -46,7 +46,14 @@ const linkSchema = new Schema(
 
 const TweetSchema = new Schema(
     {
-        url: String,
+        url: {
+            type: String,
+            required: true
+        },
+        title: {
+            type: String,
+            required: true
+        },
         user:{
             type: mongoose.Types.ObjectId,
             ref:'User'
@@ -59,7 +66,14 @@ const TweetSchema = new Schema(
 
 const YoutubeSchema = new Schema(
     {
-        url: String,
+        url: {
+            type: String,
+            required: true,
+        },
+        title: {
+            type: String,
+            required: true
+        },
         user:{
             type: mongoose.Types.ObjectId,
             ref:'User'

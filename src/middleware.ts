@@ -3,7 +3,7 @@ import { PRIVATE_KEY } from "./config"
 import { Request, Response, NextFunction } from "express"
 
 const userMiddleware = async function(req: Request, res: Response, next: NextFunction){
-    const token = req.headers['authorization']
+    const token = req.cookies?.authToken
 
     const decodedToken = jwt.verify(token as string, PRIVATE_KEY)
     if(decodedToken){

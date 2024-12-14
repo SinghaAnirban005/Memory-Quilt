@@ -12,6 +12,7 @@ import { random } from "./utils"
 import cors from "cors"
 import connectDB from "./db"
 import mongoose from "mongoose"
+import cookieParser from "cookie-parser"
 
 const app = express()
 
@@ -19,7 +20,11 @@ connectDB()
 
 app.use(express.json())
 app.use(urlencoded())
-app.use(cors())
+app.use(cors({
+    origin: "http://localhost:5173",
+    credentials: true
+}))
+app.use(cookieParser())
 
 app.post('/api/v1/signup', async(req, res) => {
     try {
@@ -49,7 +54,7 @@ app.post('/api/v1/signup', async(req, res) => {
 })
 
 app.post('/api/v1/signin', async(req, res) => {
-    const { username } = req.body
+    const { username, password } = req.body
    try {
      const existingUser = await UserModel.findOne({
          username: username
@@ -59,8 +64,13 @@ app.post('/api/v1/signin', async(req, res) => {
              _id: existingUser._id
          },PRIVATE_KEY)
          
-         res.json({
-             token: token,
+         const options = {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'None'
+         }
+         //@ts-ignore
+         res.status(200).cookie('authToken', token, options).json({
              message: "User signed in succesfully"
          })
      }
@@ -206,20 +216,21 @@ app.get('/api/v1/memory/:shareLink', async(req, res) => {
 
 app.post('/api/v1/tweet',userMiddleware, async(req, res) => {
     try {
-        const { url } = req.body
+        const { url, title } = req.body
         //@ts-ignore
         const userId = req.userId
 
-        if(!url){
+        if(!url || !title){
             res.json(
                 {
-                    message: "Please provide URL"
+                    message: "Please provide URL and title"
                 }
             )
         }
 
         const tweet = await TweetModel.create({
             url: url,
+            title: title,
             user: userId
         })
 
@@ -288,20 +299,21 @@ app.delete('api/v1/delete/tweet', async(req, res) => {
 
 app.post('/api/v1/youtube',userMiddleware, async(req, res) => {
     try {
-        const { url } = req.body
+        const { url, title } = req.body
         //@ts-ignore
         const userId = req.userId
         
-        if(!url){
+        if(!url || !title){
             res.json(
                 {
-                    message: "Please provide URL"
+                    message: "Please provide URL and title"
                 }
             )
         }
 
         const youtube = await YoutubeModel.create({
             url: url,
+            title: title,
             user: userId
         })
 
