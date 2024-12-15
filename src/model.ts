@@ -30,6 +30,8 @@ const contentSchema = new Schema({
         ref: 'User',
         required: true
     }
+},{
+    timestamps: true
 })
 
 const linkSchema = new Schema(
