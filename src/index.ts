@@ -59,6 +59,16 @@ app.post('/api/v1/signin', async(req, res) => {
      const existingUser = await UserModel.findOne({
          username: username
      })
+
+     //@ts-ignore
+     const isPasswordCorrect = await bcrypt.compare(password.trim(), (existingUser?.password))
+     if(isPasswordCorrect){
+        res.status(500).json(
+            {
+                message: "Incorrect Password"
+            }
+        )
+     }
      if(existingUser){
          const token = jwt.sign({
              _id: existingUser._id
