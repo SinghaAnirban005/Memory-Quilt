@@ -148,10 +148,10 @@ app.post('/api/v1/memory/share',userMiddleware, async(req, res) => {
     if(share){
         const existingLink = await LinkModel.find({
             //@ts-ignore
-            userId: new mongoose.Types.ObjectId(req.userId)
+            userId: req.userId
         })
         
-        if (existingLink) {
+        if (existingLink.length !== 0) {
             res.json({
                 //@ts-ignore
                 hash: existingLink[0]?.hash,
