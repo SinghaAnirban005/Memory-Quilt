@@ -21,7 +21,7 @@ connectDB()
 app.use(express.json())
 app.use(urlencoded())
 app.use(cors({
-    origin: "https://secondbrain-blond-chi.vercel.app",
+    origin: "https://secondbrain-d98e.onrender.com",
     credentials: true
 }))
 app.use(cookieParser())
