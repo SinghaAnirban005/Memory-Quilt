@@ -95,6 +95,24 @@ app.post('/api/v1/signin', async(req, res) => {
    }
 })
 
+app.post('/api/v1/logout', userMiddleware, async(req, res) => {
+    try {
+        res.clearCookie('authToken')
+    
+        res.status(200).json(
+            {
+                message: "Logged out successfully"
+            }
+        )
+    } catch (error) {
+        res.status(500).json(
+            {
+                message: "Server error"
+            }
+        )
+    }
+})
+
 app.post('/api/v1/content', userMiddleware, async(req, res) => {
     const {link, type, title} = req.body
 
