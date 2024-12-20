@@ -62,7 +62,7 @@ app.post('/api/v1/signin', async(req, res) => {
 
      //@ts-ignore
      const isPasswordCorrect = await bcrypt.compare(password.trim(), (existingUser?.password))
-     if(isPasswordCorrect){
+     if(!isPasswordCorrect){
         res.status(500).json(
             {
                 message: "Incorrect Password"
