@@ -11,7 +11,6 @@ import { userMiddleware } from "./middleware"
 import { random } from "./utils"
 import cors from "cors"
 import connectDB from "./db"
-import mongoose from "mongoose"
 import cookieParser from "cookie-parser"
 
 const app = express()
