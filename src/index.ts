@@ -18,9 +18,9 @@ const app = express()
 connectDB()
 
 app.use(express.json())
-app.use(urlencoded())
+app.use(urlencoded({extended: true}))
 app.use(cors({
-    origin: ["https://secondbrain-d98e.onrender.com", " http://localhost:5173"],
+    origin: ["https://secondbrain-d98e.onrender.com", "http://localhost:5173"],
     credentials: true
 }))
 app.use(cookieParser())
@@ -42,6 +42,7 @@ app.post('/api/v1/signup', async(req, res) => {
                 message: "User signed up"
             }
         )
+        return;
     } catch (error) {
         res.status(400).json(
             {
@@ -67,6 +68,7 @@ app.post('/api/v1/signin', async(req, res) => {
                 message: "Incorrect Password"
             }
         )
+        return;
      }
      if(existingUser){
          const token = jwt.sign({
@@ -82,6 +84,7 @@ app.post('/api/v1/signin', async(req, res) => {
          res.status(200).cookie('authToken', token, options).json({
              message: "User signed in succesfully"
          })
+         return;
      }
    } catch (error) {
         res.status(403).json(
@@ -170,6 +173,7 @@ app.post('/api/v1/memory/share',userMiddleware, async(req, res) => {
                 hash: hash
             }
         )
+        return;
     }
     else{
         await LinkModel.deleteOne({
@@ -235,6 +239,8 @@ app.post('/api/v1/tweet',userMiddleware, async(req, res) => {
                     message: "Please provide URL and title"
                 }
             )
+
+            return;
         }
 
         const tweet = await TweetModel.create({
@@ -249,6 +255,8 @@ app.post('/api/v1/tweet',userMiddleware, async(req, res) => {
                 tweet: tweet
             }
         )
+
+        return;
     } catch (error) {
         res.status(500).json(
             {
@@ -272,6 +280,8 @@ app.get('/api/v1/tweet',userMiddleware, async(req, res) => {
                 tweets: tweets
             }
         )
+
+        return;
     } catch (error) {
         res.status(500).json(
             {
@@ -290,6 +300,8 @@ app.delete('api/v1/delete/tweet', async(req, res) => {
                 message: "No URL found"
             }
         )
+
+        return;
     }
 
     await ContentModel.findOneAndDelete({
