@@ -20,7 +20,7 @@ connectDB()
 app.use(express.json())
 app.use(urlencoded({extended: true}))
 app.use(cors({
-    origin: ["https://secondbrain-d98e.onrender.com", "http://localhost:5173"],
+    origin: ["https://secondbrain-d98e.onrender.com", "http://localhost:5173", "https://memory-quilt-fe.vercel.app"],
     credentials: true
 }))
 app.use(cookieParser())
